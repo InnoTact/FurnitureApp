@@ -13,10 +13,12 @@ import ARKit
 class ARViewController: UIViewController, ARSCNViewDelegate {
     
     @IBOutlet var sceneView: ARSCNView!
+    let removeButton = UIButton()
     private var hud : MBProgressHUD!
     private var newAngleY : Float = 0.0
     private var currentAngleY : Float = 0.0
     private var localTranslatePosition: CGPoint!
+    private var adding = true
     var selectedBuilding: String!
     
     let rootScene = SCNScene()
@@ -63,12 +65,35 @@ class ARViewController: UIViewController, ARSCNViewDelegate {
         button2.setTitle("hotel", for: .normal)
         button2.addTarget(self, action: #selector(buttonAction2), for: .touchUpInside)
         self.view.addSubview(button2)
+        
+        
+        
+        removeButton.frame = CGRect(x: self.view.frame.size.width - 80, y: 20, width: 60, height: 60)
+        removeButton.layer.cornerRadius = removeButton.frame.width / 2
+        //removeButton.backgroundColor = UIColor.red
+        removeButton.setTitle("Remove", for: .normal)
+        removeButton.setImage(UIImage(named:"remove"), for: .normal)
+        removeButton.addTarget(self, action: #selector(removeOrAddButtonAction), for: .touchUpInside)
+        self.view.addSubview(removeButton)
     }
     @objc func buttonAction(sender: UIButton!) {
         selectedBuilding = "Medival_Building.DAE"
     }
+    
     @objc func buttonAction2(sender: UIButton!) {
         selectedBuilding = "hotel.dae"
+    }
+    
+    @objc func removeOrAddButtonAction(sender: UIButton!) {
+        
+        if(adding){
+            
+            removeButton.setImage(UIImage(named:"remove"), for: .normal)
+        }
+        else {
+            removeButton.setImage(UIImage(named:"add"), for: .normal)
+        }
+        adding = !adding
     }
     
     
@@ -173,15 +198,13 @@ class ARViewController: UIViewController, ARSCNViewDelegate {
     
     @objc func tapped(recognizer :UITapGestureRecognizer) {
         
-        guard let recognizerView = recognizer.view as? ARSCNView else {
-            return
-        }
+        guard let recognizerView = recognizer.view as? ARSCNView else { return }
         let touch = recognizer.location(in: recognizerView)
         
         let hitTestResults = recognizerView.hitTest(touch, types: .existingPlane)
         if let hitTest = hitTestResults.first {
+            if(adding){
             guard let buildingScene = SCNScene(named: "art.scnassets/" + selectedBuilding ) else { return }
-            print(buildingScene)
             let buildingNode = SCNNode()
             for buildingPart in buildingScene.rootNode.childNodes {
                 buildingNode.addChildNode(buildingPart)
@@ -197,12 +220,21 @@ class ARViewController: UIViewController, ARSCNViewDelegate {
                 buildingNode.scale = SCNVector3(1, 1, 1)
                 
             }
-            
             rootScene.rootNode.addChildNode(buildingNode)
-        }
-        
-    }
+            }
+            else{
+                let hitTestResults2 = self.sceneView.hitTest(touch, options: nil)
+                if let hitTest2 = hitTestResults2.first {     //If house pressed
+                    if let houseNode2 = hitTest2.node.parent { //set pressed house as active node
+                            houseNode2.removeFromParentNode()
+                }
+                
+            }
+            
+            }
     
+        }
+        }
     @objc func pinched(recognizer :UIPinchGestureRecognizer) {
         
         if recognizer.state == .changed {
