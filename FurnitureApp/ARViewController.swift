@@ -14,17 +14,20 @@ class ARViewController: UIViewController, ARSCNViewDelegate {
     
     @IBOutlet var sceneView: ARSCNView!
     let removeButton = UIButton()
+    
+    let button1 = UIButton()
+    let button2 = UIButton()
+    let button3 = UIButton()
+    let button4 = UIButton()
+    var buttonList =  [UIButton()]
     private var hud : MBProgressHUD!
     private var newAngleY : Float = 0.0
     private var currentAngleY : Float = 0.0
     private var localTranslatePosition: CGPoint!
     private var adding = true
     var selectedBuilding: String!
-    
     let rootScene = SCNScene()
-    
-    
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         print(selectedBuilding)
@@ -46,19 +49,18 @@ class ARViewController: UIViewController, ARSCNViewDelegate {
         registerGestureRecognizers()
         selectedBuilding = "Medival_Building.DAE"
     }
+    
     override func viewDidAppear(_ animated: Bool) {
-        let button = UIButton()
-        button.frame = CGRect(x: 20, y: self.view.frame.size.height - 100, width: 75, height: 75)
+        
+        button1.frame = CGRect(x: self.view.frame.size.width / 4 - 75/2  , y: self.view.frame.size.height - 100, width: 75, height: 75)
         // button.layer.cornerRadius = button.layer.borderWidth / 2
         // button.backgroundColor = UIColor.red
-        button.setImage(UIImage(named:"Medival_Building.DAE"), for: .normal)
-        button.setTitle("Medival", for: .normal)
-        button.addTarget(self, action: #selector(buttonAction), for: .touchUpInside)
-        self.view.addSubview(button)
+        button1.setImage(UIImage(named:"Medival_Building.DAE"), for: .normal)
+        button1.setTitle("Medival", for: .normal)
+        button1.addTarget(self, action: #selector(buttonAction1), for: .touchUpInside)
+        self.view.addSubview(button1)
         
-        
-        let button2 = UIButton()
-        button2.frame = CGRect(x: 120, y: self.view.frame.size.height - 100, width: 75, height: 75)
+        button2.frame = CGRect(x: self.view.frame.size.width / 2 - 75/2, y: self.view.frame.size.height - 100, width: 75, height: 75)
         // button2.layer.cornerRadius = button.layer.borderWidth / 2
         // button2.backgroundColor = UIColor.red
         button2.setImage(UIImage(named:"hotel"), for: .normal)
@@ -66,7 +68,13 @@ class ARViewController: UIViewController, ARSCNViewDelegate {
         button2.addTarget(self, action: #selector(buttonAction2), for: .touchUpInside)
         self.view.addSubview(button2)
         
-        
+        button3.frame = CGRect(x: self.view.frame.size.width * 3 / 4 - 75/2, y: self.view.frame.size.height - 100, width: 75, height: 75)
+        // button2.layer.cornerRadius = button.layer.borderWidth / 2
+        // button2.backgroundColor = UIColor.red
+        button3.setImage(UIImage(named:"spooky"), for: .normal)
+        button3.setTitle("spooky", for: .normal)
+        button3.addTarget(self, action: #selector(buttonAction3), for: .touchUpInside)
+        self.view.addSubview(button3)
         
         removeButton.frame = CGRect(x: self.view.frame.size.width - 80, y: 20, width: 60, height: 60)
         removeButton.layer.cornerRadius = removeButton.frame.width / 2
@@ -75,8 +83,11 @@ class ARViewController: UIViewController, ARSCNViewDelegate {
         removeButton.setImage(UIImage(named:"remove"), for: .normal)
         removeButton.addTarget(self, action: #selector(removeOrAddButtonAction), for: .touchUpInside)
         self.view.addSubview(removeButton)
+        
+        buttonList = [button1, button2, button3, button4]
     }
-    @objc func buttonAction(sender: UIButton!) {
+    
+    @objc func buttonAction1(sender: UIButton!) {
         selectedBuilding = "Medival_Building.DAE"
     }
     
@@ -84,20 +95,27 @@ class ARViewController: UIViewController, ARSCNViewDelegate {
         selectedBuilding = "hotel.dae"
     }
     
-    @objc func removeOrAddButtonAction(sender: UIButton!) {
-        
-        if(adding){
-            
-            removeButton.setImage(UIImage(named:"remove"), for: .normal)
-        }
-        else {
-            removeButton.setImage(UIImage(named:"add"), for: .normal)
-        }
-        adding = !adding
+    @objc func buttonAction3(sender: UIButton!) {
+        selectedBuilding = "spooky.dae"
     }
     
     
-    
+    @objc func removeOrAddButtonAction(sender: UIButton!) {
+        adding = !adding
+        if(adding){
+            removeButton.setImage(UIImage(named:"remove"), for: .normal)
+            for button in buttonList{
+                button.isHidden = false
+            }
+        }
+        else {
+            removeButton.setImage(UIImage(named:"add"), for: .normal)
+            for button in buttonList{
+                button.isHidden = true
+            }
+        }
+        
+    }
     
     private func registerGestureRecognizers(){
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapped))
@@ -112,36 +130,6 @@ class ARViewController: UIViewController, ARSCNViewDelegate {
         let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(moved))
         self.sceneView.addGestureRecognizer(longPressGestureRecognizer)
     }
-    
-    /*
-     @objc func moved(recognizer :UILongPressGestureRecognizer) {
-     guard let recognizerView = recognizer.view as? ARSCNView else {
-     return
-     }
-     
-     let touch = recognizer.location(in: recognizerView)
-     let hitTestResult = self.sceneView.hitTest(touch, options: nil)
-     
-     if let hitTest = hitTestResult.first {
-     guard let houseNode = hitTest.node.parent else { return }
-     
-     if recognizer.state == .began {
-     self.localTranslatePosition = touch
-     houseNode.opacity = 0.5
-     
-     } else if recognizer.state == .changed {
-     let deltaX = Float(touch.x - self.localTranslatePosition.x) / 300
-     let deltaY = Float(touch.y - self.localTranslatePosition.y) / 300
-     
-     houseNode.localTranslate(by: SCNVector3(deltaX, 0.0, deltaY))
-     self.localTranslatePosition = touch
-     } else if recognizer.state == .ended {
-     houseNode.opacity = 1.0
-     
-     }
-     }
-     }
-     */
     
     @objc func moved(recognizer :UILongPressGestureRecognizer) {
         
@@ -172,8 +160,6 @@ class ARViewController: UIViewController, ARSCNViewDelegate {
         }
         
     }
-    
-    
     
     @objc func panned(recognizer :UIPanGestureRecognizer) {
         if recognizer.state == .changed {
@@ -216,6 +202,9 @@ class ARViewController: UIViewController, ARSCNViewDelegate {
                 buildingNode.scale = SCNVector3(0.1, 0.1, 0.1)
             case "hotel.dae":
                 buildingNode.scale = SCNVector3(0.02, 0.02, 0.02)
+            case "spooky.dae":
+                buildingNode.scale = SCNVector3(0.06, 0.06, 0.06)
+            
             default:
                 buildingNode.scale = SCNVector3(1, 1, 1)
                 
@@ -235,6 +224,7 @@ class ARViewController: UIViewController, ARSCNViewDelegate {
     
         }
         }
+    
     @objc func pinched(recognizer :UIPinchGestureRecognizer) {
         
         if recognizer.state == .changed {
