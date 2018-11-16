@@ -18,8 +18,10 @@ class ARViewController: UIViewController, ARSCNViewDelegate {
     let button1 = UIButton()
     let button2 = UIButton()
     let button3 = UIButton()
-    let button4 = UIButton()
     var buttonList =  [UIButton()]
+    var Button1Constraint : NSLayoutConstraint!
+    var Button2Constraint : NSLayoutConstraint!
+    var Button3Constraint : NSLayoutConstraint!
     private var hud : MBProgressHUD!
     private var newAngleY : Float = 0.0
     private var currentAngleY : Float = 0.0
@@ -30,7 +32,6 @@ class ARViewController: UIViewController, ARSCNViewDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(selectedBuilding)
         
         self.sceneView.autoenablesDefaultLighting = true
         
@@ -51,8 +52,11 @@ class ARViewController: UIViewController, ARSCNViewDelegate {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        
-        button1.frame = CGRect(x: self.view.frame.size.width / 4 - 75/2  , y: self.view.frame.size.height - 100, width: 75, height: 75)
+        //self.view.layoutIfNeeded()
+        Button1Constraint = NSLayoutConstraint(item: button1, attribute: NSLayoutAttribute.bottom, relatedBy: NSLayoutRelation.equal, toItem: view, attribute: NSLayoutAttribute.bottomMargin, multiplier: 1.0, constant: 0)
+        Button2Constraint = NSLayoutConstraint(item: button2, attribute: NSLayoutAttribute.bottom, relatedBy: NSLayoutRelation.equal, toItem: view, attribute: NSLayoutAttribute.bottomMargin, multiplier: 1.0, constant: 0)
+        Button3Constraint = NSLayoutConstraint(item: button3, attribute: NSLayoutAttribute.bottom, relatedBy: NSLayoutRelation.equal, toItem: view, attribute: NSLayoutAttribute.bottomMargin, multiplier: 1.0, constant: 0)
+        button1.frame = CGRect(x: self.view.frame.size.width / 4 - 75/2  , y: self.view.frame.size.height - 100 + Button1Constraint.constant, width: 75, height: 75)
         // button.layer.cornerRadius = button.layer.borderWidth / 2
         // button.backgroundColor = UIColor.red
         button1.setImage(UIImage(named:"Medival_Building.DAE"), for: .normal)
@@ -60,7 +64,7 @@ class ARViewController: UIViewController, ARSCNViewDelegate {
         button1.addTarget(self, action: #selector(buttonAction1), for: .touchUpInside)
         self.view.addSubview(button1)
         
-        button2.frame = CGRect(x: self.view.frame.size.width / 2 - 75/2, y: self.view.frame.size.height - 100, width: 75, height: 75)
+        button2.frame = CGRect(x: self.view.frame.size.width / 2 - 75/2, y: self.view.frame.size.height - 100 + Button2Constraint.constant , width: 75, height: 75)
         // button2.layer.cornerRadius = button.layer.borderWidth / 2
         // button2.backgroundColor = UIColor.red
         button2.setImage(UIImage(named:"hotel"), for: .normal)
@@ -68,12 +72,13 @@ class ARViewController: UIViewController, ARSCNViewDelegate {
         button2.addTarget(self, action: #selector(buttonAction2), for: .touchUpInside)
         self.view.addSubview(button2)
         
-        button3.frame = CGRect(x: self.view.frame.size.width * 3 / 4 - 75/2, y: self.view.frame.size.height - 100, width: 75, height: 75)
+        button3.frame = CGRect(x: self.view.frame.size.width * 3 / 4 - 75/2, y: self.view.frame.size.height - 100 + Button3Constraint.constant, width: 75, height: 75)
         // button2.layer.cornerRadius = button.layer.borderWidth / 2
         // button2.backgroundColor = UIColor.red
         button3.setImage(UIImage(named:"spooky"), for: .normal)
         button3.setTitle("spooky", for: .normal)
         button3.addTarget(self, action: #selector(buttonAction3), for: .touchUpInside)
+        button3.imageView?.contentMode = .scaleAspectFill
         self.view.addSubview(button3)
         
         removeButton.frame = CGRect(x: self.view.frame.size.width - 80, y: 20, width: 60, height: 60)
@@ -84,19 +89,22 @@ class ARViewController: UIViewController, ARSCNViewDelegate {
         removeButton.addTarget(self, action: #selector(removeOrAddButtonAction), for: .touchUpInside)
         self.view.addSubview(removeButton)
         
-        buttonList = [button1, button2, button3, button4]
+        buttonList = [button1, button2, button3]
     }
     
     @objc func buttonAction1(sender: UIButton!) {
         selectedBuilding = "Medival_Building.DAE"
+        sender.pulsate()
     }
     
     @objc func buttonAction2(sender: UIButton!) {
         selectedBuilding = "hotel.dae"
+        sender.pulsate()
     }
     
     @objc func buttonAction3(sender: UIButton!) {
         selectedBuilding = "spooky.dae"
+        sender.pulsate()
     }
     
     
@@ -104,15 +112,37 @@ class ARViewController: UIViewController, ARSCNViewDelegate {
         adding = !adding
         if(adding){
             removeButton.setImage(UIImage(named:"remove"), for: .normal)
+            sender.flash()
+            Button1Constraint.constant = 0
+            Button2Constraint.constant = 0
+            Button3Constraint.constant = 0
             for button in buttonList{
-                button.isHidden = false
+                button.showButton()
+            }
+            UIView.animate(withDuration: 0.6) {
+                self.button1.frame = CGRect(x: self.view.frame.size.width / 4 - 75/2  , y: self.view.frame.size.height - 100 + self.Button1Constraint.constant, width: 75, height: 75)
+                self.button2.frame = CGRect(x: self.view.frame.size.width / 2 - 75/2, y: self.view.frame.size.height - 100 + self.Button2Constraint.constant , width: 75, height: 75)
+                self.button3.frame = CGRect(x: self.view.frame.size.width * 3 / 4 - 75/2, y: self.view.frame.size.height - 100 + self.Button3Constraint.constant, width: 75, height: 75)
+                self.view.layoutIfNeeded()
             }
         }
         else {
             removeButton.setImage(UIImage(named:"add"), for: .normal)
+            sender.flash()
+            Button1Constraint.constant = 100
+            Button2Constraint.constant = 100
+            Button3Constraint.constant = 100
             for button in buttonList{
-                button.isHidden = true
+                button.hideButton()
             }
+            UIView.animate(withDuration: 0.6) {
+                self.button1.frame = CGRect(x: self.view.frame.size.width / 4 - 75/2  , y: self.view.frame.size.height - 100 + self.Button1Constraint.constant, width: 75, height: 75)
+                self.button2.frame = CGRect(x: self.view.frame.size.width / 2 - 75/2, y: self.view.frame.size.height - 100 + self.Button2Constraint.constant , width: 75, height: 75)
+                self.button3.frame = CGRect(x: self.view.frame.size.width * 3 / 4 - 75/2, y: self.view.frame.size.height - 100 + self.Button3Constraint.constant, width: 75, height: 75)
+                self.view.layoutIfNeeded()
+            }
+            
+            
         }
         
     }
