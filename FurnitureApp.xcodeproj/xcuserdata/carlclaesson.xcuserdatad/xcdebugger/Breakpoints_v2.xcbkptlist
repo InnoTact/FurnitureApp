@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FurnitureApp/ARViewController.swift"
-            timestampString = "564087848.987832"
+            timestampString = "564248197.27194"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "206"
-            endingLineNumber = "206"
+            startingLineNumber = "236"
+            endingLineNumber = "236"
             landmarkName = "panned(recognizer:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FurnitureApp/ARViewController.swift"
-            timestampString = "564087848.988553"
+            timestampString = "564248197.272472"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "204"
-            endingLineNumber = "204"
+            startingLineNumber = "234"
+            endingLineNumber = "234"
             landmarkName = "panned(recognizer:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -42,11 +42,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FurnitureApp/ARViewController.swift"
-            timestampString = "564087848.98887"
+            timestampString = "564248197.272772"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "198"
-            endingLineNumber = "198"
+            startingLineNumber = "228"
+            endingLineNumber = "228"
             landmarkName = "panned(recognizer:)"
             landmarkType = "7">
          </BreakpointContent>
